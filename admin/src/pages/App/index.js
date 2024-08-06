@@ -18,7 +18,6 @@ import Homepage from '../Homepage';
 const App = () => {
   return (
     <div>
-      <h1>Plugin Id : {pluginId}</h1>
       <Switch>
         <Route
           path={`/plugins/${pluginId}`}

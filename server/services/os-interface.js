@@ -8,24 +8,18 @@ const path = require('path');
  */
 let client = null;
 
-let  host = 'localhost';
-let  protocol = 'http';
-let  port = 9201;
-let  auth = 'admin:strongPassword@999'; // For testing only. Don't store credentials in code.
-let  ca_certs_path = '/full/path/to/root-ca.pem';
+// let  host = 'localhost';
+// let  protocol = 'http';
+// let  port = 9201;
+// let  auth = 'admin:strongPassword@999';
+// let  ca_certs_path = '/full/path/to/root-ca.pem';
 
 module.exports = ({ strapi }) => ({
     
     async initializeSearchEngine({host, uname, password, cert}){
-      console.log('initializeSearchEngine : host :: ', host);
         try {
-
-            auth = uname + ':' + password;
-            cert = cert;
             
-            console.log("host :: ------------> ", host);
             client = new Client({
-                // node: protocol + '://' + auth + '@' + host + ':' + port,
                 node: host,
                 ssl: {
                     rejectUnauthorized: false
@@ -95,14 +89,14 @@ module.exports = ({ strapi }) => ({
       },
 
       async indexData({itemId, itemData}) {
-          const pluginConfig = await strapi.config.get('plugin.elasticsearch');
+          const pluginConfig = await strapi.config.get('plugin.opensearch');
           return await this.indexDataToSpecificIndex({itemId, itemData}, pluginConfig.indexAliasName);
       },
       
       async searchData(searchQuery){
         try
         {
-            const pluginConfig = await strapi.config.get('plugin.elasticsearch');
+            const pluginConfig = await strapi.config.get('plugin.opensearch');
             const result= await client.search({
               index: pluginConfig.indexAliasName,
               ...searchQuery
@@ -111,7 +105,7 @@ module.exports = ({ strapi }) => ({
         }
         catch(err)
         {
-          console.log('Search : elasticClient.searchData : Error encountered while making a search request to ElasticSearch.')
+          console.log('Search : opensearchClient.searchData : Error encountered while making a search request to opensearch.')
           throw err;
         }
       },
@@ -121,12 +115,11 @@ module.exports = ({ strapi }) => ({
         try {
           // TODO : why connection is not working
           let res = await client.ping();
-          console.log("check OPen search Connection :: res :: ", res);
           return true;
         }
         catch(error)
         {
-          console.error('strapi-plugin-elasticsearch : Could not connect to Open search.')
+          console.error('strapi-plugin-opensearch : Could not connect to Opensearch.')
           console.error(JSON.stringify(error));
           return false;
         }
@@ -173,12 +166,12 @@ module.exports = ({ strapi }) => ({
         {
           if (err.message.includes('ECONNREFUSED'))
           {
-            console.log('strapi-plugin-elasticsearch : Connection to ElasticSearch refused.')
+            console.log('strapi-plugin-opensearch : Connection to opensearch refused.')
             console.log(err);
           }
           else
           {
-            console.log('strapi-plugin-elasticsearch : Error while deleting index to ElasticSearch.')
+            console.log('strapi-plugin-opensearch : Error while deleting index to opensearch.')
             console.log(err);
           }    
         }
