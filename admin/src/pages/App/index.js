@@ -13,7 +13,7 @@ import pluginId from "../../pluginId";
 import ConfigureCollectionList from '../ConfigureCollectionList';
 import ConfigureCollection from '../ConfigureCollection';
 import ViewIndexingRunLog from '../ViewIndexingRunLog';
-import Homepage from '../Homepage';
+import Homepage from '../HomePage';
 
 const App = () => {
   return (
