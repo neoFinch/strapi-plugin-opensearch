@@ -1,3 +1,4 @@
+"use strict";
 const { Client } = require("@opensearch-project/opensearch");
 const AWS = require("aws-sdk");
 const createAwsOpensearchConnector = require("aws-opensearch-connector");
@@ -23,11 +24,10 @@ module.exports = ({ strapi }) => ({
   async initializeSearchEngine({
     useAwsConnector,
     host,
-    uname,
-    password,
     cert,
+    rejectUnauthorized,
   }) {
-    console.log({useAwsConnector})
+    let auth = "";
     try {
       if (useAwsConnector) {
         client = new Client({
@@ -38,7 +38,8 @@ module.exports = ({ strapi }) => ({
         client = new Client({
           node: host,
           ssl: {
-            rejectUnauthorized: false,
+            rejectUnauthorized: rejectUnauthorized,
+            cert: cert,
           },
         });
       }
@@ -147,15 +148,19 @@ module.exports = ({ strapi }) => ({
   async attachAliasToIndex(indexName) {
     try {
       const pluginConfig = await strapi.config.get("plugin.opensearch");
-      console.log("attachAliasToIndex ::", { pluginConfig });
+
       const aliasName = pluginConfig.indexAliasName;
+      console.log({aliasName})
+
       const aliasExists = await client.indices.existsAlias({ name: aliasName });
-      if (aliasExists) {
+
+      if (aliasExists.body) {
         console.log(
           "strapi-plugin-opensearch : Alias with this name already exists, removing it."
         );
         await client.indices.deleteAlias({ index: "*", name: aliasName });
       }
+      
       const indexExists = await client.indices.exists({ index: indexName });
       if (!indexExists) await this.createIndex(indexName);
       console.log(
@@ -164,7 +169,9 @@ module.exports = ({ strapi }) => ({
         " to index : ",
         indexName
       );
-      await client.indices.putAlias({ index: indexName, name: aliasName });
+      console.log({indexName, aliasName})
+      let aliasPutSuccess = await client.indices.putAlias({ index: indexName, name: aliasName });
+      console.log("aliasPutSuccess", aliasPutSuccess)
     } catch (err) {
       if (err.message.includes("ECONNREFUSED")) {
         console.log(
