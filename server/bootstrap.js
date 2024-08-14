@@ -29,9 +29,8 @@ module.exports = async ({ strapi }) => {
       await osInterface.initializeSearchEngine({
         useAwsConnector: pluginConfig["useAwsConnector"],
         host: connector.host,
-        uname: connector.username,
-        password: connector.password,
         cert: connector.certificate,
+        rejectUnauthorized: connector.rejectUnauthorized,
       });
       strapi.cron.add({
         opensearchIndexing: {

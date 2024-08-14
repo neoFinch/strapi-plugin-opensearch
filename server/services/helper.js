@@ -211,16 +211,13 @@ module.exports = ({ strapi }) => ({
     return {
       indexingCronSchedule:
         pluginConfig.indexingCronSchedule || "Not configured",
-      openHost: pluginConfig.searchConnector
+      opensearchHost: pluginConfig.searchConnector
         ? pluginConfig.searchConnector.host || "Not configured"
         : "Not configured",
-      openUserName: pluginConfig.searchConnector
-        ? pluginConfig.searchConnector.username || "Not configured"
-        : "Not configured",
-      openCertificate: pluginConfig.searchConnector
+      opensearchCertificate: pluginConfig.searchConnector
         ? pluginConfig.searchConnector.certificate || "Not configured"
         : "Not configured",
-      openIndexAlias: pluginConfig.indexAliasName || "Not configured",
+      opensearchIndexAlias: pluginConfig.indexAliasName || "Not configured",
       connected: connected,
       initialized: configureService.isInitialized(),
     };
