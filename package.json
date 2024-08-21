@@ -13,12 +13,6 @@
     "aws-opensearch-connector": "^1.2.0",
     "aws-sdk": "^2.1664.0"
   },
-  "devDependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-router-dom": "^5.3.4",
-    "styled-components": "^5.3.6"
-  },
   "author": {
     "name": "A Strapi developer"
   },
