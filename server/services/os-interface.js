@@ -30,10 +30,23 @@ module.exports = ({ strapi }) => ({
     let auth = "";
     try {
       if (useAwsConnector) {
+        // client = new Client({
+        //   ...createAwsOpensearchConnector(AWS.config),
+        //   node: host,
+        // });
+
+        const awsConfig = new AWS.Config({
+          region: region,
+          credentials: new AWS.CredentialProviderChain()
+        });
+
+        console.log("awsConfig --> ", awsConfig);
+
         client = new Client({
-          ...createAwsOpensearchConnector(AWS.config),
+          ...createAwsOpensearchConnector(awsConfig),
           node: host,
         });
+
       } else {
         client = new Client({
           node: host,
