@@ -11,11 +11,6 @@
   "dependencies": {
     "@opensearch-project/opensearch": "^2.11.0",
     "aws-opensearch-connector": "^1.2.0",
-    "@strapi/design-system": "^1.6.3",
-    "@strapi/helper-plugin": "^4.6.0",
-    "@strapi/icons": "^1.6.3",
-    "markdown-to-txt": "^2.0.1",
-    "prop-types": "^15.7.2",
     "aws-sdk": "^2.1664.0"
   },
   "devDependencies": {
