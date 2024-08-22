@@ -11,7 +11,8 @@
   "dependencies": {
     "@opensearch-project/opensearch": "^2.11.0",
     "aws-opensearch-connector": "^1.2.0",
-    "aws-sdk": "^2.1664.0"
+    "aws-sdk": "^2.1664.0",
+    "markdown-to-txt":"2.0.1"
   },
   "author": {
     "name": "A Strapi developer"
