@@ -9,18 +9,17 @@ const createAwsOpensearchConnector = require("aws-opensearch-connector");
 let client = null;
 
 module.exports = ({ strapi }) => ({
-  
   /**
- * Initializes the search engine with the given configuration.
- *
- * @param {Object} config - The configuration object for the search engine.
- * @param {boolean} config.useAwsConnector - Indicates whether to use the AWS connector.
- * @param {string} config.host - The host address of the search engine.
- * @param {string} config.uname - The username for authentication.
- * @param {string} config.password - The password for authentication.
- * @param {string} config.cert - The certificate for secure connection.
- * @returns {Promise<void>} A promise that resolves when the search engine is initialized.
- */
+   * Initializes the search engine with the given configuration.
+   *
+   * @param {Object} config - The configuration object for the search engine.
+   * @param {boolean} config.useAwsConnector - Indicates whether to use the AWS connector.
+   * @param {string} config.host - The host address of the search engine.
+   * @param {string} config.uname - The username for authentication.
+   * @param {string} config.password - The password for authentication.
+   * @param {string} config.cert - The certificate for secure connection.
+   * @returns {Promise<void>} A promise that resolves when the search engine is initialized.
+   */
   async initializeSearchEngine({
     useAwsConnector,
     host,
@@ -37,7 +36,7 @@ module.exports = ({ strapi }) => ({
 
         const awsConfig = new AWS.Config({
           region: region,
-          credentials: new AWS.CredentialProviderChain()
+          credentials: new AWS.CredentialProviderChain(),
         });
 
         console.log("awsConfig --> ", awsConfig);
@@ -46,7 +45,6 @@ module.exports = ({ strapi }) => ({
           ...createAwsOpensearchConnector(awsConfig),
           node: host,
         });
-
       } else {
         client = new Client({
           node: host,
@@ -129,6 +127,28 @@ module.exports = ({ strapi }) => ({
     );
   },
 
+  async removeItemFromIndex({ itemId }) {
+    const pluginConfig = await strapi.config.get("plugin.opensearch");
+    try {
+      await client.delete({
+        index: pluginConfig.indexAliasName,
+        id: itemId,
+      });
+      await client.indices.refresh({ index: pluginConfig.indexAliasName });
+    } catch (err) {
+      if (err.meta.statusCode === 404)
+        console.error(
+          "strapi-plugin-opensearch : The entry to be removed from the index already does not exist."
+        );
+      else {
+        console.error(
+          "strapi-plugin-opensearch : Error encountered while removing indexed data from opensearch."
+        );
+        throw err;
+      }
+    }
+  },
+
   async searchData(searchQuery) {
     try {
       const pluginConfig = await strapi.config.get("plugin.opensearch");
@@ -163,7 +183,7 @@ module.exports = ({ strapi }) => ({
       const pluginConfig = await strapi.config.get("plugin.opensearch");
 
       const aliasName = pluginConfig.indexAliasName;
-      console.log({aliasName})
+      console.log({ aliasName });
 
       const aliasExists = await client.indices.existsAlias({ name: aliasName });
 
@@ -173,7 +193,7 @@ module.exports = ({ strapi }) => ({
         );
         await client.indices.deleteAlias({ index: "*", name: aliasName });
       }
-      
+
       const indexExists = await client.indices.exists({ index: indexName });
       if (!indexExists) await this.createIndex(indexName);
       console.log(
@@ -182,9 +202,12 @@ module.exports = ({ strapi }) => ({
         " to index : ",
         indexName
       );
-      console.log({indexName, aliasName})
-      let aliasPutSuccess = await client.indices.putAlias({ index: indexName, name: aliasName });
-      console.log("aliasPutSuccess", aliasPutSuccess)
+      console.log({ indexName, aliasName });
+      let aliasPutSuccess = await client.indices.putAlias({
+        index: indexName,
+        name: aliasName,
+      });
+      console.log("aliasPutSuccess", aliasPutSuccess);
     } catch (err) {
       if (err.message.includes("ECONNREFUSED")) {
         console.log(
